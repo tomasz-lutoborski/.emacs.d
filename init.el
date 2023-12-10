@@ -49,10 +49,11 @@
   (setq tab-always-indent 'complete)
   (setq tab-first-completion 'word)
   (global-set-key (kbd "C-q") 'save-buffer)
-  (flymake-mode 1)
+	(global-corfu-mode)
   (setq tab-width 2))
 
 (add-hook 'prog-mode-hook #'my-prog-mode-setup)
+
 
 (setq backup-directory-alist '(("." . "~/.emacs.d/backup"))
       backup-by-copying t        ; Don't delink hardlinks
@@ -588,6 +589,7 @@
   (add-to-list 'eglot-server-programs `(elixir-mode . ("/etc/profiles/per-user/tomek/bin/elixir-ls")))
   (add-to-list 'eglot-server-programs `(clojure-mode . ("/etc/profiles/per-user/tomek/bin/clojure-lsp")))
   (add-to-list 'eglot-server-programs `(rust-mode . ("/etc/profiles/per-user/tomek/bin/rust-analyzer")))
+	(add-to-list 'eglot-server-programs `(scala-mode . ("/home/tomek/.local/share/coursier/bin/metals")))
   (setq eglot-confirm-server-initiated-edits nil))
 
 (add-hook 'prog-mode-hook 'eglot-ensure)
@@ -623,7 +625,6 @@
 
 (add-hook 'minibuffer-setup-hook #'corfu-enable-always-in-minibuffer 1)
 
-
 (use-package yasnippet
   :config
   (yas-global-mode 1))
@@ -637,10 +638,10 @@
 (fringe-mode -1)
 
 ;; change flymake underline colors to something less intrusive
-(with-eval-after-load 'flymake
-  (set-face-attribute 'flymake-error nil :underline '(:color "#dd8844" :style wave))
-  (set-face-attribute 'flymake-warning nil :underline '(:color "#979797" :style wave))
-  (set-face-attribute 'flymake-note nil :underline '(:color "#A2BF8A" :style wave)))
+(with-eval-after-load 'flycheck
+  (set-face-attribute 'flycheck-error nil :underline '(:color "#dd8844" :style wave))
+  (set-face-attribute 'flycheck-warning nil :underline '(:color "#979797" :style wave))
+  (set-face-attribute 'flycheck-info nil :underline '(:color "#A2BF8A" :style wave)))
 
 (use-package kind-icon
   :ensure t
@@ -939,5 +940,36 @@
      (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
 		 (haskell "https://github.com/tree-sitter/tree-sitter-haskell")
 		 (yaml "https://github.com/ikatyang/tree-sitter-yaml")
+		 (nix "https://github.com/nix-community/tree-sitter-nix")
+		 (zig "https://github.com/maxxnino/tree-sitter-zig")
+		 (dockerfile "https://github.com/camdencheek/tree-sitter-dockerfile")
 		 (purescript "https://github.com/postsolar/tree-sitter-purescript")))
 
+(use-package rustic)
+
+(use-package flycheck
+  :ensure t
+  :init (global-flycheck-mode))
+
+(use-package sly)
+
+(use-package sly-asdf)
+
+(use-package sly-quicklisp)
+
+(use-package geiser-racket)
+
+(use-package scala-mode
+  :interpreter ("scala" . scala-mode))
+
+(use-package sbt-mode
+  :commands sbt-start sbt-command
+  :config
+  ;; WORKAROUND: https://github.com/ensime/emacs-sbt-mode/issues/31
+  ;; allows using SPACE when in the minibuffer
+  (substitute-key-definition
+   'minibuffer-complete-word
+   'self-insert-command
+   minibuffer-local-completion-map)
+   ;; sbt-supershell kills sbt-mode:  https://github.com/hvesalai/emacs-sbt-mode/issues/152
+   (setq sbt:program-options '("-Dsbt.supershell=false")))

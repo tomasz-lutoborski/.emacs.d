@@ -943,6 +943,7 @@
 		 (nix "https://github.com/nix-community/tree-sitter-nix")
 		 (zig "https://github.com/maxxnino/tree-sitter-zig")
 		 (dockerfile "https://github.com/camdencheek/tree-sitter-dockerfile")
+		 (scala "https://github.com/tree-sitter/tree-sitter-scala")
 		 (purescript "https://github.com/postsolar/tree-sitter-purescript")))
 
 (use-package rustic)
